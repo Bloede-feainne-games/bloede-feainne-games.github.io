@@ -11,7 +11,7 @@ Plain HTML5, CSS3, and a small vanilla JavaScript navigation enhancement. No fra
 ```text
 index.html                          Home and featured games
 games/index.html                    Merge Planets and Proletarian Runner
-contact/index.html                  Public studio email placeholder
+contact/index.html                  Studio contact and public email
 privacy/merge-planets/index.html    Game privacy policy draft
 404.html                            Custom error page
 assets/css/site.css                 Shared styles and responsive layouts
@@ -26,7 +26,7 @@ Privacy URL: **https://bloede-feainne-games.github.io/privacy/merge-planets/**
 
 ## Before launch
 
-1. Replace `STUDIO_EMAIL_HERE` in Contact and the privacy policy with the studio's working public email. Do not add private contact details. To make it clickable, replace its `<span>` with an `<a href="mailto:YOUR_STUDIO_ADDRESS">YOUR_STUDIO_ADDRESS</a>`, keeping the existing class. Remove the adjacent placeholder explanations.
+1. The public studio email is **bloedefeainne.games@outlook.com**. It is linked from Contact, the privacy policy, and every page footer. Keep these copies consistent if the address changes; do not add private contact details.
 2. Complete **every `[VERIFY]` block** and both dates in the policy against the actual app build, permissions, network behavior, engine settings, and enabled dependencies. Do not submit the incomplete draft as a finalized Google Play privacy policy.
 3. Replace screenshot and game-icon placeholders when real assets are ready. Original concept artwork is explicitly labeled **not gameplay** and may remain as decoration.
 4. Keep the Google Play placeholder inactive until the game is published. Find `GOOGLE_PLAY_URL_HERE` in `games/index.html`; replace `.store-placeholder` with an ordinary anchor to the verified listing, update the adjacent note, and update Home's publication status.
@@ -100,7 +100,9 @@ Duplicate a `.game-project` article in Games, assign unique IDs, and add verifie
 
 ### Finalize the privacy policy
 
-The draft is publicly reachable but has `noindex, follow` metadata and is omitted from the sitemap. These settings do not make it private.
+The read-only Unity audit and remaining blockers are documented in [the audit report](docs/privacy-audit-merge-planets.md). The source and available APK use a legacy package ID; neither has been verified as the final `com.feainne.mergeplanets` release. Local saves are confirmed, while runtime diagnostics and several operational policies still need verification. Do not submit this draft to Google Play as finalized.
+
+The draft is ordinary static HTML with no authentication code. It has `noindex, follow` metadata and is omitted from the sitemap; these settings do not make it private. Live HTTP reachability could not be verified from the authoring environment and must be checked on the published URL before submission.
 
 After verifying all data practices and completing placeholders:
 
@@ -126,4 +128,4 @@ Static checks cover local file/fragment links, HTML structure, metadata and cano
 
 JavaScript syntax and deterministic menu event checks passed, covering toggle behavior, Escape with focus restoration, outside clicks, link selection, viewport changes, desktop initialization, and missing-element handling. These script checks do not replace browser testing. Checked text/background pairs meet the WCAG AA 4.5:1 contrast threshold for normal text.
 
-Browser rendering and interactive testing could not run because the authoring environment blocks browser process/socket startup. Desktop, tablet, mobile, keyboard, and motion behavior still need a browser check before launch, especially after final content is inserted. The public email and policy intentionally remain marked placeholders/drafts.
+Browser rendering and interactive testing could not run because the authoring environment blocks browser process/socket startup. Desktop, tablet, mobile, keyboard, and motion behavior still need a browser check before launch, especially after final content is inserted. The public email is configured. The policy remains a clearly marked source-audited draft pending final-release and operational verification; see the [audit report](docs/privacy-audit-merge-planets.md).
