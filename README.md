@@ -12,7 +12,7 @@ Plain HTML5, CSS3, and a small vanilla JavaScript navigation enhancement. No fra
 index.html                          Home and featured games
 games/index.html                    Merge Planets and Proletarian Runner
 contact/index.html                  Studio contact and public email
-privacy/merge-planets/index.html    Game privacy policy draft
+privacy/merge-planets/index.html    Merge Planets privacy policy
 404.html                            Custom error page
 assets/css/site.css                 Shared styles and responsive layouts
 assets/js/site.js                   Mobile navigation only
@@ -27,7 +27,7 @@ Privacy URL: **https://bloede-feainne-games.github.io/privacy/merge-planets/**
 ## Before launch
 
 1. The public studio email is **bloedefeainne.games@outlook.com**. It is linked from Contact, the privacy policy, and every page footer. Keep these copies consistent if the address changes; do not add private contact details.
-2. Complete **every `[VERIFY]` block** and both dates in the policy against the actual app build, permissions, network behavior, engine settings, and enabled dependencies. Do not submit the incomplete draft as a finalized Google Play privacy policy.
+2. The policy is finalized for the offline closed-testing configuration: package `com.feainne.mergeplanets`, Diagnostics/Analytics disabled, and app Internet permission removed. Keep the built artifact consistent with this configuration. See the [Data safety answers](docs/google-play-data-safety.md) and [implementation evidence](docs/privacy-audit-merge-planets.md).
 3. Replace screenshot and game-icon placeholders when real assets are ready. Original concept artwork is explicitly labeled **not gameplay** and may remain as decoration.
 4. Keep the Google Play placeholder inactive until the game is published. Find `GOOGLE_PLAY_URL_HERE` in `games/index.html`; replace `.store-placeholder` with an ordinary anchor to the verified listing, update the adjacent note, and update Home's publication status.
 
@@ -98,21 +98,15 @@ Use actual image dimensions and accurate alternative text; update the caption an
 
 Duplicate a `.game-project` article in Games, assign unique IDs, and add verified content, status, assets, store links, and any game-specific policy. Add a `.game-card` on Home and a jump-navigation link in Games. For another policy, create `privacy/GAME-SLUG/index.html`, adjust its relative paths and metadata, and supply verified game-specific information.
 
-### Finalize the privacy policy
+### Maintain the privacy policy
 
-The read-only Unity audit and remaining blockers are documented in [the audit report](docs/privacy-audit-merge-planets.md). The source and available APK use a legacy package ID; neither has been verified as the final `com.feainne.mergeplanets` release. Local saves are confirmed, while runtime diagnostics and several operational policies still need verification. Do not submit this draft to Google Play as finalized.
+The policy at `/privacy/merge-planets/` is final text for version 0.1's offline closed-testing configuration. It has an effective date, normal indexing metadata, a sitemap entry, and no verification placeholders or draft notices. The source project now uses the required package ID and includes a pause-menu policy link. See the [implementation evidence](docs/privacy-audit-merge-planets.md).
 
-The draft is ordinary static HTML with no authentication code. It has `noindex, follow` metadata and is omitted from the sitemap; these settings do not make it private. Live HTTP reachability could not be verified from the authoring environment and must be checked on the published URL before submission.
+The app's Internet permission is removed and Diagnostics/Analytics are disabled; Android backup, external-browser hosting, and voluntary support email are disclosed separately. The retention wording establishes a purpose-based correspondence policy rather than inventing a fixed number of days.
 
-After verifying all data practices and completing placeholders:
+Before changing these facts, integrations, or enabling the translation form, update the policy and Data safety answers. Planned AdMob and Remove Ads remain future features. The Unity build checks reject incompatible changes until they receive a privacy review. The AAB still needs to be built after the local Unity license and upload signing key are configured; this is documented without treating the old APK as the new release.
 
-- Remove the draft notice and set both dates.
-- Update the title/description and social metadata as needed to remove draft wording.
-- Change its robots metadata to `index, follow` and add its canonical URL to `sitemap.xml` if you want it indexed.
-- Keep the policy consistent with the released app, Google Play Data safety disclosures, and any required in-app notices.
-- Link the verified policy URL from the app and Play Console.
-
-Review the policy again before integrating advertising or purchases, using the providers actually selected. This is a policy draft, not a guarantee of legal or store compliance. Reference: [Google Play User Data policy](https://support.google.com/googleplay/android-developer/answer/10144311?hl=en).
+Policy source references: [Google Play User Data](https://support.google.com/googleplay/android-developer/answer/10144311) and [Data safety guidance](https://support.google.com/googleplay/android-developer/answer/10787469).
 
 ## Accessibility and privacy
 
@@ -128,4 +122,4 @@ Static checks cover local file/fragment links, HTML structure, metadata and cano
 
 JavaScript syntax and deterministic menu event checks passed, covering toggle behavior, Escape with focus restoration, outside clicks, link selection, viewport changes, desktop initialization, and missing-element handling. These script checks do not replace browser testing. Checked text/background pairs meet the WCAG AA 4.5:1 contrast threshold for normal text.
 
-Browser rendering and interactive testing could not run because the authoring environment blocks browser process/socket startup. Desktop, tablet, mobile, keyboard, and motion behavior still need a browser check before launch, especially after final content is inserted. The public email is configured. The policy remains a clearly marked source-audited draft pending final-release and operational verification; see the [audit report](docs/privacy-audit-merge-planets.md).
+Browser rendering and interactive testing could not run because the authoring environment blocks browser process/socket startup. Desktop, tablet, mobile, keyboard, and motion behavior still need a browser check before launch, especially after final content is inserted. The public email is configured. The policy text is finalized for the documented offline configuration. The exact build and verification limits are recorded in the [implementation report](docs/privacy-audit-merge-planets.md).

@@ -1,142 +1,98 @@
-# Merge Planets privacy audit
+# Merge Planets — privacy implementation evidence
 
-Audit date: **31 October 2026**. Developer: **Bloede Feainne Games**. Public contact: **bloedefeainne.games@outlook.com**.
+Updated **31 October 2026** for the offline closed-testing configuration. Unity source commit: `b2efc71a59c033667266a0d82d8fcdf9da819307`. Public contact: **bloedefeainne.games@outlook.com**.
 
-## Result and scope
+## Current result
 
-| Question | Result |
-| --- | --- |
-| Unity project found and source accessible? | **YES** — the `MobileGames/MergeDrop` working copy. |
-| Source, configuration, and existing APK successfully inspected? | **YES** — read-only static audit. |
-| Exact intended release and its runtime traffic verified? | **NO**. |
-| Policy ready for Google Play submission? | **NO** — the concrete blockers below remain. |
+- The Unity source project is accessible in `MobileGames/MergeDrop`.
+- Android identity is now **com.feainne.mergeplanets**, company **Bloede Feainne Games**, product **Merge Planets: Make a Galaxy!**, version **0.1 / code 1**.
+- The policy text is finalized for this configuration; placeholders and draft notices have been removed. It is indexed normally and included in the sitemap.
+- No new AAB has been built. Unity reports **“No valid Unity Editor license found”** before project compilation. No upload keystore/alias is configured. These are the concrete release-build blockers.
+- The old APK and old package identifier are historical artifacts, not evidence of the updated release. They must not be uploaded as the new closed test.
 
-The checkout is at commit `476a763d2d719fb8b4a82ef551c6c1384b261519`. Its remote HEAD and only advertised branch, `main`, matched that revision during the audit. The project was not opened in Unity, rebuilt, installed, or modified. The audit examined game code, direct and resolved packages, settings, scene references, Addressables profiles, cached Android manifests/Gradle configuration, and an existing `MergePlanets.apk` with Android's `aapt2` tool.
+This report replaces the earlier source-only draft assessment. It does not claim that a device run or traffic interception occurred.
 
-All **2,321 files** under Assets, Packages, and ProjectSettings matched the audit's source fingerprint at completion, and the Unity Git working tree remained clean. No Unity project change is included in the website commit.
+## Packages and game processing
 
-The reviewed project and existing APK both use a **legacy package identifier**, different from the requested `com.feainne.mergeplanets`. Legacy developer identity strings and a cached developer-network address are deliberately not reproduced in this public report. No APK/AAB for the requested package was found among the identified game artifacts. Existing artifacts are evidence about those builds, not proof of the intended release's behavior.
+Unity **6000.3.14f1**. Package inventory remains unchanged: 54 direct entries and 71 resolved entries, including built-in engine modules. Key runtime packages are Localization **1.5.9**, Addressables **2.9.1**, Input System **1.19.0**, URP **17.3.0**, and RTLTMPro pinned at Git tag **v4.0.0** (its cached package metadata reports **3.4.2**). Multiplayer Center is present as tooling/common definitions; no multiplayer backend or accounts are implemented.
 
-## Engine, packages, and Player Settings
+No Firebase, AdMob, billing, authentication, cloud-save, or custom telemetry integration was found or added. Built-in Analytics/UnityWebRequest modules being installed is not evidence that collection is enabled.
 
-| Area | Evidence and finding |
-| --- | --- |
-| Engine | `ProjectSettings/ProjectVersion.txt`: Unity **6000.3.14f1**, revision `d68c3f99a318`. |
-| Player identity | `ProjectSettings/ProjectSettings.asset`: legacy Android package and developer branding; version `0.1`, version code `1`. They do not yet match the requested release identity. |
-| Android | Minimum API `25`; automatic target selection in source; existing APK targets API `36`; ARM64; IL2CPP. |
-| Dependency inventory | `Packages/manifest.json`: 54 direct entries; `Packages/packages-lock.json`: 71 resolved entries, including built-in engine modules. |
-| Localization | `com.unity.localization` **1.5.9**. |
-| Addressables | Resolved `com.unity.addressables` **2.9.1**. All inspected bundled group schemas reference the local build/load profile IDs. Remote catalog building is off; remote load path is undefined. |
-| Right-to-left text | `com.nosuchstudio.rtltmpro`, pinned Git tag **v4.0.0**. Cached package metadata reports **3.4.2**; this metadata discrepancy is recorded rather than silently presenting one as the other. No runtime HTTP calls were found in its inspected C# source. |
-| Other packages | Input System **1.19.0**, Universal Render Pipeline **17.3.0**, UGUI **2.0.0**, Visual Scripting **1.9.11**, 2D tooling, Timeline, and editor/test integrations. |
-| Multiplayer Center | `com.unity.multiplayer.center` **1.0.1** is present as tooling/common definitions. Its presence does not establish player accounts, a game backend, or multiplayer data transmission; no such integration was found in the custom game code. |
-| Built-in capability modules | `com.unity.modules.unityanalytics` **1.0.0**, UnityWebRequest modules, and profiling components are present. Inclusion alone is not evidence that analytics or network requests execute. |
-| Ads, billing, Firebase, UGS | No AdMob, Firebase, Unity Ads SDK, Unity IAP, UGS core/authentication/analytics/cloud-save SDK integration or initialization was found in the package graph and custom game code. Legacy built-in Analytics settings are addressed separately below. |
-| Plugins | No custom Android manifest, Gradle template, `.aar`, `.jar`, `.so`, `.dll`, Firebase config, or Android resolver dependency XML was found under `Assets`. Generated Gradle dependencies were AndroidX UI/core and Android Games activity/frame-pacing libraries. |
-
-## Verified game-side processing
-
-The 49 custom runtime C# files were searched for persistence, networking, identifiers, accounts, SDK initialization, telemetry, external links, and permissions. Editor/test code was separated from player code to avoid mistaking editor tooling for player telemetry.
-
-| Information or behavior | Source evidence | Local or external? |
+| Data or behavior | Source evidence | Handling |
 | --- | --- | --- |
-| Best score | `Assets/_Project/Scripts/UI/HUDController.cs`: `MergeDrop.BestScore`, read/written using `PlayerPrefs`; saved on game result, pause, and quit. | App preference storage; no uploader in this path. |
-| Sound preference | `Assets/_Project/Scripts/GameSettingsService.cs`: `MergeDrop.Settings.SoundEnabled`. | Local `PlayerPrefs`. |
-| Vibration preference | Same service: `MergeDrop.Settings.VibrationEnabled`. | Local `PlayerPrefs`. |
-| Selected language | Same service and `ExplicitLocaleSelector.cs`: `MergeDrop.Settings.ExplicitLocale`; saved locale migration. | Local `PlayerPrefs`. |
-| Initial language | `ExplicitLocaleSelector.cs`: reads `CultureInfo.CurrentUICulture.Name` and resolves a supported locale. | On-device processing in the reviewed path. |
-| Current score | `GameSessionController.cs`: in-memory score/events. | On device; best score persists separately. No saved full-board state was found. |
-| Vibration | `HapticFeedbackService.cs`: `Handheld.Vibrate()` when enabled. | Device action; supports the vibration permission. |
-| Performance logging | `GamePerformanceController.cs`: screen resolution, refresh rate, frame rate/timing and quality settings logged under `DEVELOPMENT_BUILD` or `UNITY_EDITOR`. | Local `Debug.Log` in the custom code; no custom log uploader found. Whether engine services upload logs is a separate release check. |
-| Accounts, authentication, remote saves | No corresponding integration or backend calls found. | No implemented custom account/cloud-save flow found. |
-| Device IDs, IP collection, telemetry | No custom `SystemInfo` identifier collection, HTTP client, socket, UnityWebRequest request, or telemetry uploader found in runtime game code. | A negative source-search result, not a native-engine traffic measurement. |
+| Best score | `HUDController.cs`, key `MergeDrop.BestScore` | Local PlayerPrefs. |
+| Sound and vibration choices | `GameSettingsService.cs` | Local PlayerPrefs. |
+| Language selection | `GameSettingsService.cs`, `ExplicitLocaleSelector.cs` | Local PlayerPrefs; initial language uses current interface culture. |
+| Current score | `GameSessionController.cs` | In-memory gameplay; no server upload. |
+| Assets/localization | Addressables local profile/group schemas; remote catalog off and remote load path undefined | Local game content. |
+| Performance logs | `GamePerformanceController.cs`, conditional on Development build/Editor | Local logging, no custom uploader; release build is non-Development. |
+| Translation feedback | `ExternalUrlService.cs`, `ExternalLinksConfig.asset` | Destination/field IDs empty; no form opens. Release validator rejects enabling the destination without a policy review. |
+| Privacy link | `PauseMenuController.cs`, `ExternalUrlService.cs`, Main scene | Pause → Privacy Policy opens the exact HTTPS URL in an external browser, without player parameters. |
 
-The saved preferences are local in the game implementation, but that does not rule out operating-system backup. The inspected APK does not specify `allowBackup`, backup exclusions, or data-extraction rules. Android documents backup participation as the default for eligible apps. Actual backup/transfer depends on device and user settings. Neither uninstalling nor clearing the app's local storage proves that all backup copies are deleted.
+Android backup/transfer can include preferences according to platform and account settings. The app does not operate cloud synchronization or access an external backup account. This is disclosed rather than promising that uninstalling removes every possible copy.
 
-### Optional translation feedback
+## Explicit telemetry and network configuration
 
-`ExternalUrlService.cs` builds a Google Forms URL and calls `Application.OpenURL` only after the URL, expected HTTPS host, and all entry IDs pass validation. The scene references `Assets/_Project/UI/ExternalLinksConfig.asset`; that asset has an **empty destination URL and empty field IDs**, so the current code returns without opening a form.
-
-If configured later, the prefilled URL would contain the locale code, locale display name, app version, Unity platform string, and source `LanguageScreen`. Navigating to that URL would expose those parameters to its recipient before any form submission. The final form's questions, sign-in/email settings, access, retention, and provider processing would require a new review. They are not represented as an active collection flow in this policy.
-
-The same config's `privacyPolicyUrl` is empty. No runtime reader of that property or implemented privacy-link opening flow was found. A website policy does not establish that the app satisfies the separate in-app-link requirement.
-
-## Unity Analytics and diagnostics: separate findings
-
-`ProjectSettings/UnityConnectSettings.asset` contains:
+Previously the project was unlinked from Unity Cloud while a separate engine-diagnostics flag was on. Unity's version-specific documentation states diagnostics collection is disabled for unlinked projects. The closed-test change makes the intended behavior explicit:
 
 ```text
-UnityConnectSettings.m_Enabled: 0
-InsightsSettings.m_EngineDiagnosticsEnabled: 1
-InsightsSettings.m_Enabled: 0
-CrashReportingSettings.m_EnableCloudDiagnosticsReporting: 0
-UnityAnalyticsSettings.m_Enabled: 0
-UnityAnalyticsSettings.m_InitializeOnStartup: 1
-UnityAnalyticsSettings.m_PackageRequiringCoreStatsPresent: 0
-UnityAdsSettings.m_Enabled: 0
-UnityPurchasingSettings.m_Enabled: 0
-PerformanceReportingSettings.m_Enabled: 0
+Engine Diagnostics: disabled
+Legacy submitAnalytics flag: 0
+Unity Analytics: disabled; initialize on startup: 0
+Cloud Diagnostics reporting: disabled
+Performance Reporting: disabled
+Unity Ads: disabled; initialize on startup: 0
+Unity Purchasing: disabled
+Unity Cloud: unlinked
+Force Internet Permission: disabled
 ```
 
-`ProjectSettings.asset` also has `cloudEnabled: 0`, an empty `cloudProjectId`, empty enabled cloud services, `submitAnalytics: 1`, and `enableCrashReportAPI: 0`. No build-profile asset was found in Assets, ProjectSettings, or UserSettings.
+`Assets/Plugins/Android/AndroidManifest.xml` uses Unity's own library-manifest template and adds merger directives removing `INTERNET` and `ACCESS_NETWORK_STATE`. `MergePlanetsClosedTestingBuild.OnPostGenerateGradleAndroidProject` preserves those removal directives after Unity generates its Gradle project. Removing Internet permission prevents app-owned network uploads; it does not prevent the external browser from opening the policy using the browser's own permissions.
 
-These flags must not be collapsed into either “Unity definitely collects diagnostics” or “all Unity processing is disabled.” Legacy Analytics is disabled; the separate engine-diagnostics flag remains enabled; the project is unlinked. Unity's version-specific build-profile documentation says diagnostic collection requires a Unity Cloud link and is disabled for unlinked projects. That supports an expectation about this configuration, not verification of the final release's native runtime traffic. The serialized `submitAnalytics` field is recorded without assigning an unsupported meaning to it.
+The build preprocessor validates package/studio identity, diagnostics, disabled services/startup, the policy URL, the unconfigured translation destination, the custom manifest, and absence of the listed service packages. It stops builds if those facts conflict with this release's policy. It does not silently enable or add services.
 
-**Still required:** final release build/profile evidence and runtime observation of startup, gameplay, pause/resume, local settings, network recovery, and error/diagnostic paths. Confirm destinations and payload categories, including any device/install IDs, IP processing, diagnostics, logs, provider retention, consent and controls. Merely finding Unity endpoint strings, an Analytics module, or Internet permission does not establish an actual upload.
+The conclusion for this configuration is **no off-device collection or sharing by the game**. No evidence remains that specifically calls for a full traffic audit. A normal final-artifact check is still required after a build can be made.
 
-## Android artifact inspection
+## Privacy link and UI
 
-Existing `MergePlanets.apk` SHA-256:
+The scene contains a serialized `PrivacyPolicyButton` under `PauseSheet/MainContent`, bound to the controller's field. The controller adds/removes its listener with the other settings controls. `ExternalUrlService` reads the configured URL, accepts only the exact official HTTPS destination, and adds no query parameters. The displayed label is “Privacy Policy.” The pause sheet is expanded to fit the extra control at its existing portrait layout endpoints.
 
-```text
-7a7c538154d0c91b749319956a3d2e53807948b3c09a63f48afd4b120026a1a3
-```
+NUnit test sources cover the exact URL, rejecting unrelated/insecure/parameterized destinations, and presence of the bound scene button. They have compiled, but could not run inside Unity because licensing blocks startup.
 
-The APK reports version `0.1` / code `1`, target API `36`, minimum API `25`, and ARM64 native code. Its requested permissions include:
+## Website policy
 
-- `android.permission.INTERNET`.
-- `android.permission.VIBRATE`.
-- An app-scoped signature permission for AndroidX non-exported receivers.
+The public policy covers on-device saves, disabled Unity services, absence of ads/purchases/accounts, external-browser hosting, Microsoft-hosted voluntary support email, backup/deletion limits, purpose-based support retention, security, children without an invented age threshold, privacy requests, and update dates. Planned AdMob/Remove Ads remain future features.
 
-No camera, microphone, contacts, location, external-storage, advertising-ID, or billing permission was found in the inspected APK manifest. The APK and cached generated build both include Internet permission even though the source's `ForceInternetPermission` field is off. Final merged manifests matter more than that one source checkbox.
+Support retention is defined by enquiry/follow-up needs and legal obligations, rather than inventing a numerical period. Email deletion requests use the official studio address; no remote gameplay or account-deletion backend is claimed.
 
-Cached build artifacts include development player-connection configuration, whereas the existing APK's boot configuration differs. The custom build script explicitly creates a Development build. These artifacts are not interchangeable with a signed production release. No network capture, on-device behavioral test, mailbox administration review, or Unity dashboard inspection was performed. No new build was made because the Unity project must remain unchanged.
+The route is static HTML with no authentication or geofencing code. This environment could not verify live hosting access; verify the actual public URL after Pages deployment. A source commit or valid URL string alone is not claimed as a successful live HTTP check.
 
-A read-only device-discovery attempt with `adb devices -l` failed: the environment has no USB bus access and cannot create the ADB listener/network sockets. Device availability could therefore not be determined here. Runtime testing needs an environment with working Android device/ADB access, or independently supplied verifiable traffic and log evidence for the exact release.
+## Checks and limits
 
-## Website policy and Google Play Data safety
+Completed:
 
-The route `/privacy/merge-planets/` is implemented as static HTML with no authentication or geofencing code. It retains its draft notice and `noindex` metadata; `noindex` is not access control. Live hosting access still needs external confirmation. No indexable final policy is implied.
+- Runtime and Editor C# compilation with Unity's bundled Roslyn compiler against installed engine/package assemblies, including the new build helper and tests.
+- Scene ID uniqueness, internal references and parenting, exact button field/label, listener wiring, and pause-layout minimums.
+- Package identity, telemetry flags, manifest XML and permission removal instructions.
+- Website navigation, anchors, metadata, email addresses, removal of policy placeholders/draft notices, sitemap entry, and unchanged CSS/JavaScript/artwork.
 
-| Area | Current policy treatment / Data safety consequence |
-| --- | --- |
-| Best score, language, sound, vibration | Described as on-device preferences in the reviewed code, with Android backup caveat. Google's form distinguishes on-device-only processing from off-device transmission. |
-| Unity runtime data | Explicitly unresolved for the requested release; no fabricated collection or blanket “no data collected” claim. SDK/engine transmissions must be included if verified. |
-| Support email | Public Outlook address and voluntary correspondence described separately from game telemetry. Retention and operational safeguards still need studio confirmation. |
-| Google Forms | Described as unconfigured, with no current form opening; future activation needs a provider/data-flow review. |
-| Advertising / billing | No current integrations. Planned AdMob and one-time Remove Ads purchase are clearly future work. No future SDK behavior is presented as current. |
-| Children | No invented age threshold, adult-only assertion, or unsupported parental/child-data claim. Audience confirmation remains required. |
-| Security and deletion | Actual local storage behavior is distinguished from unverified encryption, provider retention, mail controls, and backup erasure. |
+Pending because of concrete environment/release prerequisites:
 
-No Play Console Data safety answers were submitted or certified. They must match the same verified release inventory as the finalized policy.
+1. Activate a valid Unity Editor license. The installed Editor exits with code 198 and a missing headless entitlement/license before opening the project for compilation/build.
+2. Select the correct upload keystore and alias locally. No signing identity was generated, no passwords were read into reports, and signing files are ignored by Git.
+3. Build with `MergePlanetsClosedTestingBuild.BuildClosedTesting`, inspect the actual merged AAB manifest, and perform the normal settings/browser smoke check. No final artifact or test run is represented as already successful.
+4. Confirm the public hosted policy URL. Direct HTTP requests and the web-fetch tool were unavailable for this domain in the authoring environment.
 
-## Exact remaining blockers
+These do not justify retaining generic privacy placeholders or demanding a full network audit. The policy describes the established source configuration; closed-test upload remains gated by an actual signed, matching build.
 
-1. **Release identity and artifact:** identify the exact source revision and provide access to the production APK/AAB for `com.feainne.mergeplanets`, its merged manifest, and build/profile configuration. The accessible source is real, but the intended package is not configured there. Confirm the public developer identity in the store listing.
-2. **Runtime/Unity evidence:** verify the final Unity Cloud/Diagnostics state and observe actual release traffic. Supply a controlled test device/build and suitable network/log evidence, or equivalent verifiable results; provide Unity dashboard configuration if that release is linked. Determine actual data categories, recipients, purposes, retention, and controls if transmissions occur.
-3. **Backup behavior:** confirm final Android backup/device-transfer settings and the scope of saved preferences included.
-4. **Audience:** confirm intended Google Play age groups and regions served, then any applicable child-data and consent handling. This cannot be inferred from casual gameplay or absence of an age gate.
-5. **Support operations:** specify actual support/privacy-email retention and deletion criteria, mailbox/backup handling, authorized access and safeguards, and applicable request-handling procedures. No private inbox access is required merely to provide these policy decisions.
-6. **In-app policy access:** verify an actual link or policy text in the app and its designated Play Console link. The current config is empty; this audit intentionally does not modify it.
-7. **Publication:** set the effective date and confirm material-update notification procedures after the release and operational checks. Live HTTP access must be verified externally: this environment's direct request failed DNS resolution and its web fetch could not retrieve the hosted page.
-
-There is **no missing permission to read the discovered Unity source**. The missing evidence is the exact intended release, its observed runtime behavior, and the studio's operational/audience decisions. Until these are resolved, the policy is **not ready** for Google Play submission.
-
-## Official references reviewed
+## References
 
 - [Google Play User Data policy](https://support.google.com/googleplay/android-developer/answer/10144311).
-- [Google Play Data safety definitions and guidance](https://support.google.com/googleplay/android-developer/answer/10787469).
-- [Unity 6.3 build-profile diagnostics reference](https://docs.unity.com/en-us/engine/6000.3/manual/building-and-publishing/build-settings/build-profiles-reference).
-- [Unity developer privacy FAQ](https://unity.com/legal/developer-privacy-policy-faq) and [player/app-user privacy policy](https://unity.com/legal/game-player-and-app-user-privacy-policy).
-- [Android Auto Backup documentation](https://developer.android.com/identity/data/autobackup).
+- [Google Play Data safety guidance](https://support.google.com/googleplay/android-developer/answer/10787469).
+- [Unity 6.3 diagnostics/build-profile behavior](https://docs.unity.com/en-us/engine/6000.3/manual/building-and-publishing/build-settings/build-profiles-reference).
+- [Unity EngineDiagnosticsSettings.enabled API](https://docs.unity.com/en-us/engine/6000.3/script-reference/unityeditor/enginediagnostics/enginediagnosticssettings/enabled).
+- [Android backup behavior](https://developer.android.com/identity/data/autobackup).
+- [GitHub Pages hosting logs](https://docs.github.com/en/pages/getting-started-with-github-pages/what-is-github-pages).
 - [Microsoft Privacy Statement](https://www.microsoft.com/en-us/privacy/privacystatement).
+
+Use [the exact Data safety answer guide](google-play-data-safety.md) for this configuration.
