@@ -16,7 +16,7 @@ privacy/merge-planets/index.html    Merge Planets privacy policy
 404.html                            Custom error page
 assets/css/site.css                 Shared styles and responsive layouts
 assets/js/site.js                   Mobile navigation only
-assets/images/                     Original SVG artwork, mark, favicon, social card
+assets/images/                     Studio splash, concept art, mark, favicon, social card
 robots.txt                          Crawler settings and sitemap location
 sitemap.xml                         Indexable canonical URLs
 .nojekyll                           Disable Jekyll processing
@@ -71,7 +71,7 @@ Official references: [publishing source](https://docs.github.com/en/pages/gettin
 
 ## Maintain and extend
 
-Design tokens live at the top of `assets/css/site.css`. Typography uses system sans-serif fonts and local serif fallbacks. All artwork is original SVG; no fonts or images are downloaded from other services.
+Design tokens live at the top of `assets/css/site.css`. The visual identity follows the supplied studio splash: black, crimson, warm gold, serif headings, and fine ornamental dividers. Typography uses system sans-serif fonts and local serif fallbacks. All assets are hosted locally; no fonts or images are downloaded from other services.
 
 Headers and footers are ordinary HTML repeated across all five pages. Update all copies when navigation or branding changes. Nested pages use relative paths. The custom 404 uses root-relative paths so it works at any missing URL on this organization site.
 
@@ -90,9 +90,9 @@ Put optimized images you own in `assets/images/`. Replace each `.screen-placehol
 
 Use actual image dimensions and accurate alternative text; update the caption and remove placeholder wording. Images keep their natural proportions. Replace `game-icon-placeholder.svg` and update its alternative text when the real game icon is ready.
 
-`studio-mark.svg` and `favicon.svg` are original studio marks. `eclipse.svg` is decorative Home artwork. The two game concept illustrations are not actual game environments or screenshots. Use only your own or appropriately licensed replacement assets.
+`studio-splash.webp` is the optimized, full composition of the studio artwork supplied in the repository root. Home uses it as its main image. `studio-mark.svg` contains a self-contained crop of the same emblem; `favicon.svg` is a simplified crimson-and-gold interpretation for small sizes. `eclipse.svg` is retained as a legacy asset. The two game concept illustrations use the studio palette and are not actual game environments or screenshots. Use only your own or appropriately licensed replacement assets.
 
-`social-card.svg` is the editable source of the **1200 × 630** Open Graph image. `social-card.png` is its committed raster export, referenced by Open Graph and Twitter metadata. If editing the SVG, export an updated PNG with a local graphics editor. No graphics software is needed to deploy the existing files.
+`social-card.svg` is the self-contained **1200 × 630** composition of the supplied studio splash. `social-card.png` is the matching raster version referenced by Open Graph and Twitter metadata. When replacing the studio artwork, update both versions. No graphics software is needed to deploy the existing files.
 
 ### Add another game
 
@@ -122,4 +122,4 @@ Static checks cover local file/fragment links, HTML structure, metadata and cano
 
 JavaScript syntax and deterministic menu event checks passed, covering toggle behavior, Escape with focus restoration, outside clicks, link selection, viewport changes, desktop initialization, and missing-element handling. These script checks do not replace browser testing. Checked text/background pairs meet the WCAG AA 4.5:1 contrast threshold for normal text.
 
-Browser rendering and interactive testing could not run because the authoring environment blocks browser process/socket startup. Desktop, tablet, mobile, keyboard, and motion behavior still need a browser check before launch, especially after final content is inserted. The public email is configured. The policy text is finalized for the documented offline configuration. The exact build and verification limits are recorded in the [implementation report](docs/privacy-audit-merge-planets.md).
+The crimson-and-gold redesign was checked in a browser on 2 November 2026. All five pages were checked at 320, 768, and 1280 px viewport widths, with no horizontal overflow or missing eager-loaded images; Home and Games were also inspected at 390 px. Mobile menu opening, Escape with focus restoration, and navigation to Games passed. Desktop Home and the privacy page were visually inspected. All 102 local file and fragment references passed static checks. The policy HTML was compared byte for byte against its pre-redesign working copy and is unchanged, including its existing local edits. Browser testing does not establish the behavior of the game itself; the app-specific build and verification limits remain in the [implementation report](docs/privacy-audit-merge-planets.md).
