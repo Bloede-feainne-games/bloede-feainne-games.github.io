@@ -1,20 +1,80 @@
+# Privacy evidence — Merge Planets with Google Play Games
+
+Audit date: **3 November 2026**. The findings below describe the current working tree and supersede the earlier offline conclusions for the online release. Earlier source-audit notes are preserved below as historical evidence.
+
+## Current evidence and limits
+
+- Source: the local Unity repository `MergeDrop`, current branch `main`; Unity 6000.3.27f2, source app version 0.1.1 / Android version code 2, package `com.feainne.mergeplanets`. No game source/configuration is changed by this privacy task.
+- `Resources/PlayGamesConfiguration.asset`: both EnableGooglePlayGames and IncludeGooglePlayGamesInBuild true. Android scripting define MERGE_PLANETS_GPGS is set.
+- Embedded official Google Unity runtime 2.2.1, with documented acknowledgement/optional-Nearby patches. `Editor/PlayGamesBuildConfiguration.cs` pins `com.google.android.gms:play-services-games-v2:22.0.0` in generated Gradle. Native smoke releaseRuntimeClasspath resolves Play Services base 18.5.0, basement 18.9.0, tasks 18.2.0 and ordinary AndroidX/Kotlin dependencies. No Firebase, Nearby, ads or billing dependency was found in that runtime report. This is not evidence that a future final AAB has the identical graph.
+- Tracked Android manifest permits INTERNET and ACCESS_NETWORK_STATE and declares the game APP_ID, native bridge activity, and suppression of automatic profile-creation prompts. It does not suppress authentication or all native SDK activity.
+- Existing `Library/PGS-NativeSmoke` merged manifest contains PlayGamesInitProvider. Its isolated APK has INTERNET; the offline smoke artifact has neither Internet nor Google provider. These are isolated validation artifacts, **not the final Unity game AAB**.
+- UnityConnectSettings: Unity Analytics/startup, Engine Diagnostics, Cloud Diagnostics, Performance Reporting and Ads disabled. No Unity Cloud project is linked. Their disabled state does not disable Google metrics.
+
+## Application-level data flow
+
+| Evidence | Confirmed behavior |
+| --- | --- |
+| `Scripts/PlayGames/GoogleProvider/GooglePlayGamesProvider.cs` | Automatic Authenticate; manual ManuallyAuthenticate; GetUserId/GetUserDisplayName; ReportScore; UnlockAchievement; native leaderboard/achievement UI; network-only snapshot open/read/commit/manual conflict handling. No request for email/server auth scopes/friends from our code. |
+| Vendored `AndroidClient.SignInOnResult` and `AndroidJavaConverter.ToPlayer` | getCurrentPlayer populates display name, Player ID, icon-image/ avatar URL in plugin memory. No custom image upload or photo-library access by game code found. |
+| Patched AndroidClient score/unlock methods | submitScoreImmediate/unlockImmediate Tasks supply acknowledgements; not an assertion of a tested production server write. |
+| `PlayGamesSyncService` | Automatically authenticates, uploads persisted completed-score outbox/earned First Fusion and synchronizes cloud data after successful login. Three-attempt failure limits. Inspector gate protects our calls. No universal user-facing SDK-off control. CancelConflict postpones conflicts, not all transmission. |
+| `MergeController.PlanetMerged`, `PlayGamesSceneBridge.SessionChanged` | First Fusion from a real successful merge; completed score recorded at GameOver. |
+| `PlayGamesSceneBridge.Capture`, `Core/PlayGamesProgress.cs` | Cloud envelope: version, best score, First Fusion, run snapshot JSON, revision/parent and progress/history flags. No sound/vibration/language preference, player name, email or hardware/ad identifier in this payload. Google still associates it with its authenticated player. |
+| `Persistence/GameRunSaveData.cs` | Local-format snapshot holds current/starting-best scores, planet levels/poses/velocities/sleep state, preview/queue/cooldown and danger timers. The same run JSON is embedded in cloud data. |
+| `PlayGamesProgressStore`, `GameRunSaveStore`, `GameSettingsService`, `HUDController` | Local JSON/checkpoint/recovery files, ownerPlayerId, score outbox entries, receipts, achievement and PlayerPrefs best score/preferences. Record GUIDs are save/event revisions, not proof of persistent device identification. No fixed retention TTL. |
+| `PlayGamesPanel` and provider interfaces | No current DeleteCloudData button or universal opt-out/sign-out flow; no studio account-registration/backend. SDK has deletion APIs upstream, but installed API availability is not an implemented user-facing erasure feature. |
+| `ExternalLinksConfig`, `ExternalUrlService` | Fixed HTTPS policy URL opens external browser without player parameters. Translation feedback unconfigured. Email is voluntary, external to game. |
+
+## Provider statements vs unverified fields
+
+[Google's PGS disclosure](https://developer.android.com/games/pgs/data-collection) states gamer-identity, automatic analytics/diagnostics, HTTPS transport and Google deletion controls. It explicitly describes the **latest SDK** and does not list a version-specific wire schema for 22.0.0. Therefore particular AAID/Android ID/App Set ID/hardware IDs, separate crash stack traces, and interaction-event fields are **not certified** by that page or our source search. Do not infer location from mere IP routing or treat Player ID as a Device ID.
+
+No app-owned calls for location, advertising ID, deviceUniqueIdentifier, contacts or custom network telemetry were found. This absence cannot certify proprietary GMS internals. It also does not justify inventing a specific identifier collection claim.
+
+## Published website comparison
+
+On 3 November 2026 a direct unauthenticated HTTPS GET of the public policy returned HTTP 200 (15,856 bytes). Web retrieval was not supported by the browsing tool, so direct HTTP was used. Live text was dated 31 October 2026 and still stated no off-device collection/sign-in/cloud saves. The local working copy already had 1 November local-save additions; those correct facts were retained in the replacement. This task changes local files only; live content remains unchanged until an authorized deployment.
+
+## Recommended disclosures and unresolved decisions
+
+Use [the detailed Data safety guide](google-play-data-safety.md), replacing the old No-collection answers. Name, User IDs and gameplay/Other actions are code-confirmed; Diagnostics is provider-documented. Shared/Required are recommended for the current automatic workflow without assuming a processor/user-initiated exception. Device IDs, separate crash logs/interaction metrics need exact native-version disclosure. App-account/OAuth/deletion wording needs alignment with the actual Console question and Google policy scope; no unsupported deletion badge or fixed deadline is asserted.
+
+The revised public-policy source identifies Google processing, local/cloud retention, actual Google/Android deletion routes, re-upload risks, transport vs local encryption, Unity-disabled services, email and hosting. It does not claim review approval, legal certification or complete native telemetry inventory.
+
+## Not performed in this task
+
+The existing `Builds/Android/MergePlanets-closed-test.aab` was also inspected read-only: modified 1 November 2026 at 18:21:49 UTC, 55,569,852 bytes. Its dependency protobufs contain no play-services-games-v2 coordinate and its manifest protobuf has no Internet/network-state/AD_ID/Billing permissions, Games APP_ID or PlayGamesInitProvider strings. This is the old offline artifact, not the integrated update. A new release artifact is still needed.
+
+No game changes, rebuild, device execution, traffic interception, Console submission, new branch, commit, push or publication. Inspection of a **new online AAB**, exact provider disclosure and the specific Console deletion/account classification remain the concrete pre-submission checks. There is no blanket request for a full traffic audit.
+
+---
+
+## Historical offline audit (not the current online declaration)
+
 # Merge Planets — privacy implementation evidence
 
-Updated **31 October 2026** for the offline closed-testing configuration. Unity source commit: `b2efc71a59c033667266a0d82d8fcdf9da819307`. Public contact: **bloedefeainne.games@outlook.com**.
+Updated **1 November 2026** for the local run-save addition. Baseline Unity source commit: `b2efc71a59c033667266a0d82d8fcdf9da819307`. Public contact: **bloedefeainne.games@outlook.com**.
 
-## Current result
+## Local run-save follow-up
+
+The current Unity working tree uses **6000.3.27f2** and adds `Scripts/Persistence/GameRunPersistence.cs`, `GameRunSaveData.cs` and `GameRunSaveStore.cs`. An unfinished run is saved to `Application.persistentDataPath/current-run.json`, with temporary/previous-checkpoint recovery files. The snapshot contains the current score, run-start best score, planet levels/poses/velocities/sleep state, current preview and next planet, remaining spawn delay, and danger-zone timers. It is loaded locally and cleared on restart/game over; best-score/preferences remain separate.
+
+This feature adds file IO, not an upload, account, SDK, permission or device identifier. It uses no game-provided encryption layer. The policy now discloses local unfinished-run storage and possible OS-controlled backup of app data. Save/recovery and restore behavior are covered by the Unity tests. A newly built or device-tested artifact containing this feature is not claimed here.
+
+## Baseline configuration
 
 - The Unity source project is accessible in `MobileGames/MergeDrop`.
 - Android identity is now **com.feainne.mergeplanets**, company **Bloede Feainne Games**, product **Merge Planets: Make a Galaxy!**, version **0.1 / code 1**.
 - The policy text is finalized for this configuration; placeholders and draft notices have been removed. It is indexed normally and included in the sitemap.
-- No new AAB has been built. Unity reports **“No valid Unity Editor license found”** before project compilation. No upload keystore/alias is configured. These are the concrete release-build blockers.
+- License and signing configuration were build blockers at the original baseline audit. They are historical observations, not the current editor status. No new APK/AAB containing the local-save change has been built as part of this follow-up.
 - The old APK and old package identifier are historical artifacts, not evidence of the updated release. They must not be uploaded as the new closed test.
 
 This report replaces the earlier source-only draft assessment. It does not claim that a device run or traffic interception occurred.
 
 ## Packages and game processing
 
-Unity **6000.3.14f1**. Package inventory remains unchanged: 54 direct entries and 71 resolved entries, including built-in engine modules. Key runtime packages are Localization **1.5.9**, Addressables **2.9.1**, Input System **1.19.0**, URP **17.3.0**, and RTLTMPro pinned at Git tag **v4.0.0** (its cached package metadata reports **3.4.2**). Multiplayer Center is present as tooling/common definitions; no multiplayer backend or accounts are implemented.
+The original baseline used Unity **6000.3.14f1**, 54 direct package entries and 71 resolved entries, including built-in engine modules. Key baseline runtime packages were Localization **1.5.9**, Addressables **2.9.1**, Input System **1.19.0**, URP **17.3.0**, and RTLTMPro pinned at Git tag **v4.0.0** (its cached package metadata reported **3.4.2**). The local-save follow-up adds no package dependency. Multiplayer Center is tooling/common definitions; no multiplayer backend or accounts are implemented.
 
 No Firebase, AdMob, billing, authentication, cloud-save, or custom telemetry integration was found or added. Built-in Analytics/UnityWebRequest modules being installed is not evidence that collection is enabled.
 
@@ -23,13 +83,13 @@ No Firebase, AdMob, billing, authentication, cloud-save, or custom telemetry int
 | Best score | `HUDController.cs`, key `MergeDrop.BestScore` | Local PlayerPrefs. |
 | Sound and vibration choices | `GameSettingsService.cs` | Local PlayerPrefs. |
 | Language selection | `GameSettingsService.cs`, `ExplicitLocaleSelector.cs` | Local PlayerPrefs; initial language uses current interface culture. |
-| Current score | `GameSessionController.cs` | In-memory gameplay; no server upload. |
+| Unfinished run, current score, board and queue | `Scripts/Persistence/`, `SpawnController.cs`, `GameSessionController.cs`, `LoseConditionController.cs` | Local snapshot/recovery files for resume; no server upload. |
 | Assets/localization | Addressables local profile/group schemas; remote catalog off and remote load path undefined | Local game content. |
 | Performance logs | `GamePerformanceController.cs`, conditional on Development build/Editor | Local logging, no custom uploader; release build is non-Development. |
 | Translation feedback | `ExternalUrlService.cs`, `ExternalLinksConfig.asset` | Destination/field IDs empty; no form opens. Release validator rejects enabling the destination without a policy review. |
 | Privacy link | `PauseMenuController.cs`, `ExternalUrlService.cs`, Main scene | Pause → Privacy Policy opens the exact HTTPS URL in an external browser, without player parameters. |
 
-Android backup/transfer can include preferences according to platform and account settings. The app does not operate cloud synchronization or access an external backup account. This is disclosed rather than promising that uninstalling removes every possible copy.
+Android backup/transfer can include local app data according to platform and account settings. The app does not operate cloud synchronization or access an external backup account. This is disclosed rather than promising that uninstalling removes every possible copy.
 
 ## Explicit telemetry and network configuration
 

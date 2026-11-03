@@ -27,7 +27,7 @@ Privacy URL: **https://bloede-feainne-games.github.io/privacy/merge-planets/**
 ## Before launch
 
 1. The public studio email is **bloedefeainne.games@outlook.com**. It is linked from Contact, the privacy policy, and every page footer. Keep these copies consistent if the address changes; do not add private contact details.
-2. The policy is finalized for the offline closed-testing configuration: package `com.feainne.mergeplanets`, Diagnostics/Analytics disabled, and app Internet permission removed. Keep the built artifact consistent with this configuration. See the [Data safety answers](docs/google-play-data-safety.md) and [implementation evidence](docs/privacy-audit-merge-planets.md).
+2. The local policy now describes the Google Play Games update for `com.feainne.mergeplanets`. Publish it only with authorization and resolve the documented native-SDK/Console questions before Data safety submission. See the [Data safety guide](docs/google-play-data-safety.md) and [implementation evidence](docs/privacy-audit-merge-planets.md).
 3. Replace screenshot and game-icon placeholders when real assets are ready. Original concept artwork is explicitly labeled **not gameplay** and may remain as decoration.
 4. Keep the Google Play placeholder inactive until the game is published. Find `GOOGLE_PLAY_URL_HERE` in `games/index.html`; replace `.store-placeholder` with an ordinary anchor to the verified listing, update the adjacent note, and update Home's publication status.
 
@@ -100,13 +100,22 @@ Duplicate a `.game-project` article in Games, assign unique IDs, and add verifie
 
 ### Maintain the privacy policy
 
-The policy at `/privacy/merge-planets/` is final text for version 0.1's offline closed-testing configuration. It has an effective date, normal indexing metadata, a sitemap entry, and no verification placeholders or draft notices. The source project now uses the required package ID and includes a pause-menu policy link. See the [implementation evidence](docs/privacy-audit-merge-planets.md).
+The local policy source at `/privacy/merge-planets/` has been revised on 3 November
+2026 for the Google Play Games-enabled release, preserving local-save, support,
+hosting and backup disclosures. It describes Google identity/gameplay/cloud data,
+automatic SDK metrics, actual deletion controls and the limits of local erasure.
+Unity reporting remains disabled; Google's SDK is a separate data flow.
 
-The app's Internet permission is removed and Diagnostics/Analytics are disabled; Android backup, external-browser hosting, and voluntary support email are disclosed separately. The retention wording establishes a purpose-based correspondence policy rather than inventing a fixed number of days.
+See the [Data safety question-by-question guide](docs/google-play-data-safety.md)
+and [source evidence and remaining unknowns](docs/privacy-audit-merge-planets.md).
+The old offline No-collection answers must not be reused for the online update.
+No final AAB or Play review is certified. Confirm native-version details and
+account/deletion classification before submitting; use the actual release's
+metadata and deployment date. Changes are local until an authorized commit/push
+and Pages deployment; preparing this text does not publish it.
 
-Before changing these facts, integrations, or enabling the translation form, update the policy and Data safety answers. Planned AdMob and Remove Ads remain future features. The Unity build checks reject incompatible changes until they receive a privacy review. The AAB still needs to be built after the local Unity license and upload signing key are configured; this is documented without treating the old APK as the new release.
-
-Policy source references: [Google Play User Data](https://support.google.com/googleplay/android-developer/answer/10144311) and [Data safety guidance](https://support.google.com/googleplay/android-developer/answer/10787469).
+Future advertising, billing or feedback-form changes require matching updates.
+The policy page layout/styles/navigation are unchanged by this content update.
 
 ## Accessibility and privacy
 
