@@ -1,113 +1,102 @@
-# Google Play Data safety — Merge Planets с Google Play Games
+# Merge Planets — изменения Data Safety перед рекламным выпуском
 
-Дата проверки: **3 ноября 2026**. Package: `com.feainne.mergeplanets`. Разработчик: Bloede Feainne Games. Публичный контакт: `bloedefeainne.games@outlook.com`.
+Обновлено **5 ноября 2026**. Пакет `com.feainne.mergeplanets`. Основание: [новый аудит исходников и APK](advertising-privacy-audit-2026-11-05.md). Этот документ заменяет offline/PGS-only рекомендации для новой рекламной конфигурации. Форма в Play Console **не изменялась и не отправлялась**.
 
-## Область применимости и статус
+Проверенная конфигурация: **Alpha 0.3 / code 4, Google TestAdMob, две возрастные ветки, реальные покупки выключены**. Yandex/адаптер/AppMetrica/Varioqub физически исключены из проверенного APK, хотя dependency declarations остались в Unity. Production Google-only и будущая Yandex integration выключены. Источник: актуализация в начале [аудита](advertising-privacy-audit-2026-11-05.md), проверка DEX и manifest, [новый source snapshot](unified-privacy-source-snapshot.json).
 
-Это инструкция для **онлайн-конфигурации текущего Unity working tree**: Unity 6000.3.27f2, версия приложения 0.1.1 / version code 2 в исходниках, Google Unity Plugin 2.2.1, native `play-services-games-v2:22.0.0`. Оба поля `EnableGooglePlayGames` и `IncludeGooglePlayGamesInBuild` включены; Android define `MERGE_PLANETS_GPGS` присутствует. Версию фактически загружаемого AAB нужно сверить отдельно.
+**Это подготовленные ответы, а не проверка сохранённой анкеты Console.** Её текущий export/скриншоты недоступны; фактические страны, age groups и активные tracks ещё не установлены. Ниже указаны расхождения со старыми локальными инструкциями и условные изменения формы.
 
-Старые ответы «данные не собираются» **не применять** к обновлению. Форма относится к приложению/package и совокупности активных вариантов, а не только к одному экрану или одной стране. Офлайн-версия не отменяет сбор в доступной онлайн-версии.
+## 1. Что изменить в Console
 
-Проверены исходники, SDK, существующие отчёты Gradle/native smoke manifest и найденный старый AAB. Найден `Builds/Android/MergePlanets-closed-test.aab` от **1 ноября 2026 18:21:49 UTC**: в его dependency metadata нет PGS, а в protobuf manifest нет INTERNET, ACCESS_NETWORK_STATE, APP_ID и PlayGamesInitProvider. Он предшествует интеграции; это не аудит нового релизного AAB, не проверка Google-аккаунта на телефоне и не чтение заполненной формы в вашем Play Console. Нельзя объявить оставшиеся неизвестные параметры Google известными только на основании отсутствия вызова в игровом C#.
+1. **Data collection and security → collects or shares user data: Yes.** Не возвращать offline No. Учитывать и SDK, и PGS/cloud, даже без собственного сервера.
+2. **Добавить/подтвердить рекламные типы:** Approximate location, App interactions, Device or other IDs, Diagnostics. Источник этой четвёрки — актуальный Google Mobile Ads disclosure; сведения о Yandex не копировать из Google автоматически.
+3. **Сохранить PGS:** gamer identity / User IDs, gameplay scores, achievements, cloud board/atlas/laser-and-daily-gift progress. Gameplay относится к **App activity → Other actions**, а не к пользовательским документам. Наличие JSON не создаёт Files and docs; автоматически сгенерированное состояние игры не следует по умолчанию превращать в Other user-generated content.
+4. **В рекламных строках поставить Collected=Yes и Shared=Yes**, цели по таблице ниже. Для PGS не применять исключение sharing без проверки конкретного потока.
+5. **Ephemeral=No** для указанных передаваемых типов: обработка только на время одного запроса не подтверждена. Это не утверждение о придуманном сроке хранения.
+6. **Не добавлять Personalization**: наш код отключает персонализацию. `npa=1` не отменяет остальные типы/цели.
+7. **Privacy policy URL** сохранить: `https://bloede-feainne-games.github.io/privacy/merge-planets/`. Сначала опубликовать проверенную редакцию и проверить HTTPS/старые anchors перед отправкой формы.
 
-Политика для публикации: `https://bloede-feainne-games.github.io/privacy/merge-planets/`. Подготовленные изменения пока локальные. Перед отправкой формы необходимо отдельно разрешить публикацию политики, затем проверить её публичную версию.
+Data Safety описывает совокупность активных распространённых версий. Если хотя бы одна собирает тип обязательно, итоговая строка типа должна быть Required, даже если новая рекламная функция для него Optional. Сначала получить список реально активных tracks/artifacts; внутренний тест и публичные/закрытые tracks имеют разные требования.
 
-## 1. Основные вопросы формы
+## 2. Точные рекламные строки
 
-Точные формулировки/условные поля могут отличаться. Названия ниже соответствуют смыслу официальной формы; при наличии её CSV-экспорта следует сопоставить реальные question IDs.
+| Поле Console | Collected / Shared | Required или Optional | Ephemeral | Цели collection и sharing |
+| --- | --- | --- | --- | --- |
+| Location → **Approximate location** | **Yes / Yes** — Google IP-derived general location | **Optional для ad-only потока**: UMP/ad initialization активируются после добровольного рекламного действия, локальная игра доступна без него | **No** | **Advertising or marketing; Analytics; Fraud prevention, security, and compliance** |
+| App activity → **App interactions** | **Yes / Yes** — Google SDK/ad interactions, taps/video views | **Optional для ad-only потока**; если другой активный SDK/версия собирает этот тип обязательно — **Required** для итоговой строки | **No** | **Advertising or marketing; Analytics; Fraud prevention, security, and compliance** |
+| Device or other IDs → **Device or other IDs** | **Yes / Yes** — Google disclosure включает app set/другие технические ID | **Optional для подтверждённого ad-only потока**; перед Submit уточнить, добавляет ли PGS 22.0.0 обязательный сбор того же типа, тогда итог **Required** | **No** | **Advertising or marketing; Analytics; Fraud prevention, security, and compliance** |
+| App info and performance → **Diagnostics** | **Yes / Yes** — Google SDK reliability/performance information | **Required в итоговой форме**: PGS имеет automatic diagnostics без универсального in-app opt-out; рекламная часть сама по себе on-demand | **No** | **Analytics**, а для Mobile Ads также **Advertising or marketing; Fraud prevention, security, and compliance** |
 
-| Вопрос | Рекомендуемый ответ для текущего кода | Обоснование / ограничение |
+Это точные ответы для подтверждённого рекламного потока, а не заявление о каждом внутреннем поле закрытых SDK. Optional основан на реальном initial opt-in к рекламной функции, а не на возможности закрыть уже показанное видео. Возможность прекратить показ не равна отключению всех операций уже initialized Google SDK. Исправления session fences и privacy-options проверены статически; cold-start, отзыв и рестарт ещё требуют device QA. Если проверка cold-start/других SDK покажет обработку до выбора, пересчитать Optional для соответствующих типов.
+
+**Yandex в текущей Alpha:** дополнительных runtime-получателей Yandex/AppMetrica нет; не указывать их сбор как уже действующий на основании developer dependency XML. Google-типы выше остаются необходимыми независимо от тестовых объявлений. Если в активных распространяемых старых сборках есть иной SDK/сбор, его нужно учесть отдельно.
+
+**При будущей активации:** сверить фактические Yandex categories/permissions/транзитивные модули с [официальным SDK8 disclosure](https://ads.yandex.com/helpcenter/en/dev/android/app-privacy-android). Его default table описывает permission-dependent Device or other IDs и Advertising or marketing; App interactions, Diagnostics, Crash logs и location по умолчанию отмечены No. Это не доказательство отсутствия любого сетевого или служебного processing в будущей интеграции. Старые Unity-вызовы location/analytics setters удалены вместе с Yandex runtime — нельзя описывать их как работающую защиту будущего релиза. Ограничения должны быть реализованы заново и проверены.
+
+## 3. Сохранить прежние PGS-потоки
+
+| Тип Console | Что сохранить | Handling / цели |
 | --- | --- | --- |
-| Does your app collect or share any of the required user data types? | **Yes** | PGS получает идентичность, игровые результаты, достижение, сохранения; SDK документирует собственные метрики. Наличие только Google-сервера не превращает передачу в локальную обработку. |
-| Is all user data collected by your app encrypted in transit? | **Yes, на основании документации PGS и найденных потоков** | Google заявляет HTTPS для данных своего PGS disclosure; собственных HTTP uploads не найдено. Это не проверка пакетов и не end-to-end encryption. Если финальный APK содержит иной endpoint/SDK, ответ пересмотреть. |
-| Which account-creation methods does your app support? | **OAuth / Google-managed sign-in — для вопроса о поддерживаемой SSO-аутентификации; границы account creation подтвердить по реальной форме** | Своей регистрации/базы аккаунтов нет; используется профиль Google Play Games, а ручной вход может предложить создание Google-managed gamer profile. Google включает SSO в определение app account. Поэтому автоматически выбирать «My app does not allow users to create an account» лишь из-за отсутствия своего backend нельзя. Если форма отдельно различает только внешний вход и создание app account, сверить её точную формулировку и PGS flow. Для применимого OAuth/app-account flow выполнить требования удаления до подачи. |
-| Can users log in with accounts created outside your app? | **Yes — Google Play Games / Google-managed account** | Есть автоматический Authenticate и ручной ManuallyAuthenticate. Нельзя отвечать No только потому, что ввод пароля выполняет Google. |
-| Do you provide a way for users to request that their data is deleted? | **Не заявлять безусловный Yes для всех данных приложения; при общем вопросе о едином реализованном механизме — No** | В игре нет DeleteCloudData, sign-out/opt-out и студийного механизма удаления всех Google-данных. В политике даны реальные Google self-service и Android controls; email удаляет студийную переписку, а не Google-аккаунт. Если конкретное поле Console принимает маршрут удаления у поставщика, согласовать ответ Yes с его точной формулировкой и проверить этот маршрут для своей игры. |
-| Is data automatically deleted within 90 days? | **No** | Ни локальный формат, ни очередь, ни настройки не имеют такого TTL. Для Google такой срок не подтверждён. |
-| Account deletion URL, если обязателен | **Не выдавать существующий privacy URL за проверенный полноценный механизм удаления app account** | `…/privacy/merge-planets/#retention` — доступная инструкция для Google/local/support данных. Если применяется app-account requirement, отдельно подтвердить, что данный flow соответствует ему, либо реализовать требуемый путь. Одного текста политики недостаточно для отсутствующей функции. |
-| Independent security review / MASA | **No / не отмечать** | Тесты Unity и R8 не являются независимой сертификацией. |
-| Families commitment badge | **Не отмечать без отдельного подтверждения** | Возрастную аудиторию и Families compliance нельзя определить по этой интеграции. Локальная игра без входа сама по себе не сертифицирует онлайн SDK для детей. |
-| UPI verification | **Не применимо / не отмечать** | Платёжной функции нет. |
+| Personal info → **User IDs** | Play Games Player ID, связанный score/achievement/cloud progress | **Collected=Yes; Shared=Yes** без неподтверждённого исключения; **Required** для текущего automatic flow без универсального in-app SDK-off control; **Ephemeral=No; App functionality** |
+| App activity → **Other actions** | Результаты партий, достижения, atlas discoveries, board/run snapshot, laser reward/spending ledger, gift dates, sync/integrity metadata | **Collected=Yes; Shared=Yes** с тем же ограничением; **Required** для текущей automatic synchronization вошедшего игрока; **Ephemeral=No; App functionality**. Не добавлять advertising purpose к самому board payload — в custom ad targeting он не передаётся |
+| Personal info → **Name** | Существующее раскрытие gamer display name / Google-managed gamer identity | Не удалять прежний Name на основании только отсутствия собственного текстового ввода. Точное Collected/Shared/Required поле проверить для actual native profile-creation/edit flow: простое получение уже существующего имени с сервера не является само по себе исходящей передачей. Если игра предоставляет Google-managed создание/изменение имени — **Yes / Yes, No ephemeral, App functionality**; Required/Optional — по реальному выбору пользователя до передачи |
+| App info and performance → **Diagnostics** | Automatic PGS diagnostics, Google-documented | Объединить с рекламной строкой выше; выключенный Unity Diagnostics не означает выключенный PGS |
 
-**Разделение account creation и sign-in:** Play Games Player ID — идентичность игрока, даже без собственной базы аккаунтов. Вопрос о внешнем входе имеет положительный ответ; SSO/OAuth нельзя отрицать только из-за отсутствия своего сервера. Трактовку создания Google-managed gamer profile в конкретном вопросе формы нужно подтвердить по Google policy/поддержке; статический код не заменяет это решение.
+**Не переносить неустановленные сведения из старых отчётов в обязательные галочки.** SDK Index/disclosure PGS описывает latest SDK и не даёт полной wire-schema 22.0.0. Для Name/profile flow, отдельного Crash logs и обязательного Device IDs вне ads нужны точечные подтверждения. Google-managed identity, рейтинг, достижения и сохранения продолжают быть полностью раскрыты в политике независимо от классификации отдельных Console типов.
 
-## 2. Типы данных и ответы по каждому
+## 4. Что не добавлять без нового потока
 
-Статусы: **подтверждено кодом**; **документировано Google**; **не установлено для pinned SDK**. Во всех подтверждённых строках ниже **Ephemeral processing: No**: имя обслуживает профиль, идентификатор связывает записи, результаты/сохранения удерживаются, для SDK-метрик не доказана обработка только в памяти на время одного запроса.
+- **Precise location:** No по проверенным API/permissions; приблизительное IP-location AdMob всё равно Yes.
+- **Age / Other personal info:** числовой возраст, DOB и даты перехода не передаются нашим кодом; отдельная age collection на основании только локального `age-eligibility.json` не добавляется. Regulatory age-treatment/TFUA/consent signals действительно передаются SDK и описаны в политике; это не загрузка полного возраста/DOB. Если поставщик классифицирует сохраняемый возрастной статус как Other info, дополнить строку по его фактическому disclosure.
+- **Crash logs:** отдельный тип пока не подтверждён; не выдавать общие Diagnostics или присутствие AppMetrica crash API за crash upload. Сначала ответ поставщика/точечная проверка конкретного режима; это оставшийся вопрос перед Submit, а не подтверждённый No.
+- **Photos/videos:** загрузка avatar URL для leaderboard не доказывает upload пользовательской фотографии; проверить только actual Google-managed profile creation/edit flow, не добавлять произвольный Photos Yes.
+- **Financial info / purchase history:** реальная оплата выключена. Rewarded receipt GUID и laser spending — игровые события, не платёжная карта и не подтверждённая реальная покупка. Unity IAP установлен ≠ Billing активирован. При включении IAP нужна новая проверка.
+- Не добавлять email/телефон/адрес/контакты/health/audio/messages/search/browsing/installed apps/user documents без подтверждённой передачи. `queries` install-referrer provider и открытие policy во внешнем браузере не доказывают сбор списка приложений или истории браузера.
 
-| Data type в Console | Что найдено | Collected | Shared | Required / optional | Purposes of collection / sharing |
-| --- | --- | --- | --- | --- | --- |
-| Personal info → **Name** | Gamer display name, включая nickname; приложение читает его у Google и показывает в статусе. Не утверждается доступ к юридическому имени. | **Yes** | **Yes — рекомендуемая классификация без неподтверждённого исключения** | **Required для текущего автоматического flow**; Optional допустимо только после проверки универсального пользовательского выбора до сбора | **App functionality**. Для Google-managed profile — **Account management**, если форма относит его к аккаунту приложения. Нельзя автоматически добавлять marketing/personalization. |
-| Personal info → **User IDs** | Play Games Player ID; локально `ownerPlayerId`, онлайн идентичность связывает score/achievement/snapshot | **Yes** | **Yes** с тем же ограничением исключений | **Required в текущем flow** | **App functionality**; условный **Account management** как выше |
-| App activity → **Other actions** | Завершённые игровые результаты, First Fusion, состояние игрового поля, рекорд и cloud save metadata | **Yes** | **Yes** | **Required для автоматически синхронизируемых данных вошедшего игрока**; не Optional из-за наличия кнопки Sync | **App functionality**. Свои gameplay analytics/Game Stats events код не отправляет; Analytics не добавлять к каждому score по одному лишь имени SDK. |
-| App info and performance → **Diagnostics** | Google документирует автоматические SDK diagnostics и stability/product-improvement analytics | **Yes — на основании заявления поставщика, не перехвата трафика** | **Yes**: собственные цели Google не подтверждают роль исключительно service provider | **Required**: пользовательского отключения SDK-метрик в приложении нет | **Analytics** (оценка работы/надёжности и исправление проблем); App functionality только если подтверждена отдельная функциональная необходимость |
-| App activity → **App interactions** | Своих событий кликов/экранов нет; общее слово Analytics в PGS disclosure не перечисляет конкретные interaction events | **Не установлено отдельно** | Не выбирать автоматически | Если Google подтвердит такие автоматические события: Required без реального opt-out | Analytics, если подтверждено; не выдумывать перечень событий |
-| App info and performance → **Crash logs** | Unity reporting выключен. Общее Diagnostics у Google не подтверждает конкретную отправку stack traces/crash logs native SDK 22.0.0 | **Не установлено отдельно** | Уточнить у поставщика | При подтверждении automatic crash collection: Required | Analytics; не подставлять наличие Crashlytics — его нет |
-| Device or other IDs → **Device or other IDs** | Свои вызовы hardware/ad ID не найдены; Player ID является User ID. PGS disclosure не перечисляет конкретные технические IDs для 22.0.0 | **Не установлено для SDK** | Уточнить | Если подтвердится автоматический сбор — Required, если нет универсального opt-out | Точные цели взять из version-specific disclosure, не придумывать advertising |
+## 5. Security practices, deletion и соседние декларации
 
-**Required не означает, что играть без сети запрещено.** Это классификация контроля сбора. Уже вошедший игрок получает автоматическую синхронизацию, а видимый интерфейс не предлагает отключить её. Inspector-флаг — выбор разработчика, не настройка для всех пользователей. Условия Google за пределами приложения могут влиять на вход; чтобы объявить категорию Optional, нужно подтвердить работоспособный выбор для всех пользователей/регионов до передачи соответствующего типа.
-
-**Не подменять неизвестное запасным Yes или No.** Для трёх неподтверждённых типов нужна актуальная информация Google именно о `play-services-games-v2:22.0.0` (и его GMS processing): SDK Index/письменное разъяснение с типами, целями, обязательностью и передачей. Документ Google прямо ограничивает свою таблицу последней версией SDK. Общий сетевой аудит не назначается: вопрос адресный, о закрытой native SDK и её disclosure.
-
-## 3. Передача третьим лицам и исключения Shared
-
-Для текущего flow рекомендуем **Collected + Shared** для подтверждённых онлайн-типов, а не «No sharing, потому что это Google». Это рекомендация по классификации, не утверждение о проверенном договорном статусе Google.
-
-Снять Shared можно **для конкретного потока**, если подтверждено применимое исключение Google:
-
-- Service provider обрабатывает данные только по поручению разработчика. У PGS есть собственные Google-managed profile/service и цели улучшения SDK; роль исключительно processor для всех потоков не установлена.
-- User-initiated transfer требует конкретного ожидаемого действия пользователя либо надлежащего раскрытия/согласия. Общая автоматическая авторизация, последующие фоновые sync и SDK-метрики не получают это исключение только от наличия Sign in / Sync.
-- Не заявлять anonymization: Player ID и связанное с ним игровое состояние псевдонимны, не доказанно анонимны.
-
-Таблицы лидеров могут показывать gamer identity/результаты другим игрокам с учётом Google visibility settings. Cloud snapshot не публикуется как leaderboard entry. Эти различия остаются в политике независимо от галочки Shared.
-
-## 4. Остальные категории
-
-| Категория | Рекомендация по найденной реализации |
+| Вопрос | Подготовленный ответ / изменение |
 | --- | --- |
-| Location: precise / approximate | Не выбирать без подтверждённого сбора/вывода местоположения. Location API/permission/геоаналитики в игровом коде нет. Наличие IP у сетевого сервера само по себе не доказывает IP-based geolocation. |
-| Email, address, phone, sensitive personal traits | Не выбирать для игрового SDK flow: таких запросов/payload нет. Добровольное письмо студии через отдельное приложение описано отдельно; игра не читает почтовый ящик. |
-| Financial / purchase history | Не выбирать: рекламы и billing/IAP нет. Планируемая Remove Ads покупка не реализована. |
-| Health / fitness | Не выбирать. |
-| Messages | Не выбирать: встроенной почты/чата/доступа к SMS нет. |
-| Photos / videos | Не выбирать на основании одного avatar URL: нет загрузки фотографий пользователя или чтения его галереи игровым кодом. Google profile/avatar metadata раскрыта как часть профиля. При добавлении custom-photo upload этот вывод пересмотреть. |
-| Audio | Не выбирать: встроенная фоновая музыка — контент игры, а не сбор пользовательских аудиофайлов. |
-| Files / docs | Не выбирать только потому, что JSON назван файлом: app-generated game state относится к gameplay/Other actions; пользовательские документы не читаются. |
-| Calendar / contacts | Не выбирать. Вызовов friend-list API из нашей интеграции также нет. |
-| Search / installed apps / browsing history | Не выбирать: таких payload нет. Открытие фиксированной policy URL в внешнем браузере не означает сбор истории браузера игрой. |
-| Other user-generated content / other performance data | Не добавлять без отдельного подтверждённого потока. |
+| Encryption in transit | **Yes для проверенного Google test flow** по provider HTTPS/TLS statements. Для будущего production Yandex/AppMetrica подтвердить, что *все* фактические каналы соответствуют этому ответу. Нельзя отмечать общий Yes на основании проверки одного Google endpoint. Local JSON не имеет отдельного confidentiality encryption |
+| Deletion request | Предоставить `https://bloede-feainne-games.github.io/privacy/merge-planets/#retention`: реальные Android, Google game-data и vendor request routes, studio email. Удаление студийной переписки и запрос поставщику имеют разный охват. Не представлять это как реализованную in-game кнопку «стереть всё» или гарантированный отзыв всех SDK данных |
+| Automatically deleted within 90 days | **No** — такой TTL для gameplay/age/vendor data не реализован/не подтверждён |
+| Independent security review / MASA | **No / не отмечать** — source audit и Unity tests не являются независимой сертификацией |
+| Families commitment / badge | Не выдавать этот аудит за положительную сертификацию; перед утверждением проверить serving/format и остальные условия, подтвердить actual 6+ age groups и применимые правила |
+| App account creation/deletion | Собственного email/password backend нет; используется внешний Google Play Games account. Сохранить фактическое раскрытие external sign-in. Классификацию Google-managed profile creation и account-deletion requirement подтвердить по actual Console wording/flow; не подменять обязательный механизм одной privacy-страницей |
+| **Contains ads** (App content, отдельно от Data Safety) | **Yes** — rewarded SDK ads, включая Google demo/test; убрать «рекламы нет» |
+| **Advertising ID** (App content, отдельно) | Checked target36 validation APK не содержит **AD_ID**; это не основание для No в **Device or other IDs**. Для декларации AAID проверить финальный AAB и provider/config-specific доступ: отсутствие разрешения/удалённый optional модуль не доказывают отсутствие других ID |
+| Target Audience and Content | Проверить и выбрать реальные группы для 6+, а не автоматически «18+» из-за взрослой рекламы. Child/Teen/Unknown допускаются к restricted Google ads; Adult — к взрослой Google ветке. Yandex недоступен всем в текущей Alpha. Страны ещё не подтверждены |
 
-Вопрос **Advertising ID** — отдельная декларация App content: своего использования и ads SDK нет; в inspected native smoke manifest нет AD_ID. Окончательный ответ для публикации сверить с настоящим AAB. Не путать Play Games Player ID и рекламный ID.
+## 6. Расхождения и delta после включения Yandex
 
-## 5. Удаление и удержание — фактические границы
+| Проверяемое утверждение / изменение | Что делать с декларацией |
+| --- | --- |
+| «Test ads не собирают данные» / old offline No | Неверно уже для Alpha: collects/shares Yes, Google advertising строки выше плюс PGS |
+| «Все under-18/Unknown без рекламы» | Устарело: включён restricted Google-only route. Проверить optional/required для всего app; нельзя сделать данные детей невидимыми в форме |
+| «Yandex/AppMetrica уже собирают в Alpha» | Не подтверждается и противоречит APK: не добавлять текущий Yandex flow. Условный абзац политики не является доказательством сбора |
+| Новая Yandex сеть использует только уже раскрытые Device IDs для Advertising/marketing | Категория/цель могут уже быть Yes из-за Google: нового checkbox по названию сети нет. Всё равно повторно проверить collected/shared, optionality, retention, encryption, deletion и документировать нового получателя; обновить vendor/CMP настройки |
+| Появятся AppMetrica telemetry, crash upload, дополнительные identifiers, location или consent/age uploads | Добавить только реально возникшие типы: например Crash logs / Diagnostics / Device IDs / Approximate location / Other personal info, и их реальные цели, collected/shared, required/optional и ephemeral. Нет заранее утверждённого набора для ещё не реализованного runtime. Дополнительные непокрытые цели/данные требуют изменения самой политики до включения |
+| SDK начнёт работать при старте без добровольного ad action | Пересчитать Optional: такой тип может стать Required. Анализировать все источники, включая PGS, а не только новый vendor |
+| Меняются transport/retention/deletion | Пересмотреть app-wide encryption/deletion ответы. Не обещать полного удаления provider data через Clear storage |
+| Разрешается AAID или новые Android permissions | Повторно проверить отдельную Advertising ID декларацию и ограничения Families; строка Device IDs уже Yes не разрешает передачу AAID детьми/Unknown |
+| Test units заменяются live Google-only units, данные и цели не меняются | Сами по себе новые IDs/оплата рекламы не требуют новых data-type галочек или переписывания политики. Live inventory, UMP, SDK поведение и Families формат нужно проверить |
+| Новые achievements, интерфейс, SDK version без изменения обработки | Количество achievements и версии не входят в политику. Подтвердить отсутствие новых полей/получателей/целей при diff-аудите; только после этого оставлять disclosures прежними |
 
-- Local `current-run.json`, `.bak`, `play-games-progress.json`, его backup, `pre-cloud-restore.json` и PlayerPrefs удаляются вместе через Android Clear storage. Restart очищает только текущую партию, не весь набор данных.
-- Очередь score удаляет запись после подтверждённого SDK callback. Получение квитанции не означает удаления результата с Google leaderboard.
-- Поле ownerPlayerId, earned First Fusion, acknowledgements и best score не имеют фиксированного TTL. Finished-run marker предотвращает восстановление завершённой партии из старой копии, но не является полной privacy erasure.
-- Google позволяет удалять данные конкретной игры/profile через собственные controls. Отдельная Play History и provider retention могут требовать других действий; фиксированные 30/90 дней не подтверждены.
-- Локальные копии/очереди и другие устройства могут повторно загрузить ранее удалённый cloud progress. Перед очисткой остановить игру, проверить sign-in/access settings Google, очистить local storage на всех своих устройствах и проверить Android backups. Не обещать вечную блокировку повторного сбора: её в игре нет.
-- У студии нет нового player-data backend. Outlook-переписка удаляется по запросу в пределах реально контролируемой студией информации; это не универсальная команда удаления Google-данных.
-- `EnableGooglePlayGames=false` блокирует наш код, но не гарантирует тишину native SDK в уже собранной онлайн-версии. Native smoke manifest содержит PlayGamesInitProvider. Полное исключение SDK — отдельная конфигурация сборки, а не пользовательский privacy control.
+Consent records/age flags описаны публично. Отдельная классификация Other personal info зависит от фактически передаваемых и сохраняемых SDK полей; local age file сам по себе не является off-device collection. Consent purpose нельзя автоматически назвать рекламной персонализацией, если запросы остаются npa.
 
-## 6. Что подтвердить перед отправкой формы
+## 7. Перед Submit
 
-1. Разрешить публикацию подготовленной политики и проверить публичный HTTPS URL. До этого live-страница продолжает описывать офлайн-релиз.
-2. Проверить release AAB: точные SDK/версии, INTERNET/ACCESS_NETWORK_STATE, PlayGamesInitProvider, отсутствие неожиданного Ads/Billing/AD_ID/другого SDK. Smoke APK не является финальным артефактом игры.
-3. Получить version-specific ответ Google по Device/other IDs, отдельным Crash logs и App interactions. Сохранить его рядом с этой инструкцией; не переносить Firebase/AdMob disclosure на PGS.
-4. Сверить account-creation/external-login/deletion вопросы реальной формы и трактовку PGS profile/SSO. Если нужен app-account deletion flow, он должен действительно существовать — HTML не добавляет SDK.Delete в приложение.
-5. Для Optional подтвердить универсальный пользовательский выбор до сбора; в текущем коде его нет. Для снятия Shared подтвердить исключение для каждого потока, не для компании Google в целом.
-6. Подтвердить реальную target audience/Families configuration и допустимость Google-функций для неё. Не придумывать возрастной порог или существующий age gate.
+1. Получить текущую анкету Console и список активных artifacts/tracks; сравнить каждую строку выше с реальными ответами. Без этого нельзя заявлять «расхождений нет».
+2. Проверить Google-only live inventory для детей/Unknown, реальный rewarded format/закрываемость, age flags, UMP consent/revocation/restart privacy entry. Общий аудит Families включает и PGS6+.
+3. Для будущего Yandex реализовать runtime provider-specific consent, RU-only adult routing, безопасный native lifecycle и защиту после смены игрока/отзыва. Текущий Validate запрещает эту функцию; изменения кабинета недостаточны.
+4. Проверить конечный signed release AAB, а не полагаться только на unsigned validation APK и Gradle-шаблон.
+5. Разрешить оставшиеся вопросы **Name/profile flow; отдельные Crash logs; PGS Device IDs/requiredness; точная классификация consent signals; будущий Yandex/AppMetrica processing; all-channels encryption/deletion scope**. Неподтверждённые поля не отправлять как установленные факты.
+6. Опубликовать подготовленную политику по прежнему URL после отдельного решения о публикации, затем сохранить/отправить корректные ответы Console. Эта задача не выполняет push и не меняет Console.
 
-Итог: основные потоки и рекомендуемые ответы подготовлены, но форма **не сертифицирована для Submit**, пока перечисленные точечные неизвестные не разрешены. Это не требование полного перехвата сетевого трафика.
+## Официальные основания
 
-## Официальные источники
-
-- PGS SDK disclosure (таблица описывает latest SDK): https://developer.android.com/games/pgs/data-collection
-- Data safety, категории, обязательность и sharing exceptions: https://support.google.com/googleplay/android-developer/answer/10787469
-- Типы данных Android: https://developer.android.com/privacy-and-security/declare-data-use
-- Account deletion / SSO scope: https://support.google.com/googleplay/android-developer/answer/13327111?hl=en
-- Удаление данных игры/profile и отдельная Play History: https://support.google.com/googleplay/answer/9130646?hl=en
-- User Data policy: https://support.google.com/googleplay/android-developer/answer/10144311
-- Google Privacy Policy: https://policies.google.com/privacy
-
-Проверка исходников и границы evidence: [privacy-audit-merge-planets.md](privacy-audit-merge-planets.md).
+- [Mobile Ads Unity disclosure](https://developers.google.com/admob/unity/privacy/play-data-disclosure), [Android disclosure](https://developers.google.com/admob/android/privacy/play-data-disclosure).
+- [PGS disclosure](https://developer.android.com/games/pgs/data-collection), [типы Android](https://developer.android.com/privacy-and-security/declare-data-use).
+- [Data Safety definitions, purposes, optional/required, aggregation and sharing exceptions](https://support.google.com/googleplay/android-developer/answer/10787469?hl=en).
+- [Yandex SDK 8 disclosure](https://ads.yandex.com/helpcenter/en/dev/android/app-privacy-android), [AppMetrica ID module](https://appmetrica.yandex.com/docs/en/sdk/android/get-ad-id).
+- [UMP and vendor consent](https://developers.google.com/admob/unity/privacy/gdpr), [Families](https://support.google.com/googleplay/android-developer/answer/9893335?hl=en).

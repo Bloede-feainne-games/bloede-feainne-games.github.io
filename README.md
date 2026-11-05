@@ -27,11 +27,11 @@ Privacy URL: **https://bloede-feainne-games.github.io/privacy/merge-planets/**
 ## Before launch
 
 1. The public studio email is **bloedefeainne.games@outlook.com**. It is linked from Contact, the privacy policy, and every page footer. Keep these copies consistent if the address changes; do not add private contact details.
-2. The local policy now describes the Google Play Games update for `com.feainne.mergeplanets`. Publish it only with authorization and resolve the documented native-SDK/Console questions before Data safety submission. See the [Data safety guide](docs/google-play-data-safety.md) and [implementation evidence](docs/privacy-audit-merge-planets.md).
+2. The local policy now describes the Google Play Games update for `com.feainne.mergeplanets`. Publish it only with authorization and resolve the documented native-SDK/Console questions before Data safety submission. See the [Data safety guide](docs/google-play-data-safety.md) and [current implementation evidence](docs/advertising-privacy-audit-2026-11-05.md).
 3. Replace screenshot and game-icon placeholders when real assets are ready. Original concept artwork is explicitly labeled **not gameplay** and may remain as decoration.
 4. Keep the Google Play placeholder inactive until the game is published. Find `GOOGLE_PLAY_URL_HERE` in `games/index.html`; replace `.store-placeholder` with an ordinary anchor to the verified listing, update the adjacent note, and update Home's publication status.
 
-The supplied current status is **no integrated advertising or in-app purchases; both are planned for a future update**. That does not establish the absence of other data processing. No unverified SDKs, Unity services, safeguards, age thresholds, or gameplay details have been asserted. Proletarian Runner is labeled **In Development**, without an invented platform or release date.
+The audited Alpha uses **optional Google rewarded ads and UMP with separate adult and restricted age routes**. Yandex/AppMetrica are excluded from its Android runtime. The policy conditionally describes a planned adult-only Yandex route in Russia; enabling it requires implementation and verification of consent and safe native lifecycle. Production ads and real purchases remain disabled. See the [updated audit](docs/advertising-privacy-audit-2026-11-05.md) and [Data Safety changes](docs/google-play-data-safety.md). Proletarian Runner is labeled **In Development**, without an invented platform or release date.
 
 ## Preview
 
@@ -100,22 +100,22 @@ Duplicate a `.game-project` article in Games, assign unique IDs, and add verifie
 
 ### Maintain the privacy policy
 
-The local policy source at `/privacy/merge-planets/` has been revised on 3 November
-2026 for the Google Play Games-enabled release, preserving local-save, support,
-hosting and backup disclosures. It describes Google identity/gameplay/cloud data,
-automatic SDK metrics, actual deletion controls and the limits of local erasure.
-Unity reporting remains disabled; Google's SDK is a separate data flow.
+The policy at `/privacy/merge-planets/`, revised 5 November 2026, covers Google
+Play Games, achievements and rankings, local/cloud saves, optional rewarded ads,
+age records, UMP choices, deletion, hosting and support. It distinguishes the
+Google-only Alpha from conditional adult-only Yandex mediation. It contains no
+SDK/build versions or fixed achievement count.
 
-See the [Data safety question-by-question guide](docs/google-play-data-safety.md)
-and [source evidence and remaining unknowns](docs/privacy-audit-merge-planets.md).
-The old offline No-collection answers must not be reused for the online update.
-No final AAB or Play review is certified. Confirm native-version details and
-account/deletion classification before submitting; use the actual release's
-metadata and deployment date. Changes are local until an authorized commit/push
-and Pages deployment; preparing this text does not publish it.
+Read the current addendum at the start of the [source/APK audit](docs/advertising-privacy-audit-2026-11-05.md)
+and the [Data Safety guide](docs/google-play-data-safety.md). Older audit sections
+remain historical evidence for earlier artifacts. Preparing the files does not
+publish them, submit Console answers or enable production advertising.
 
-Future advertising, billing or feedback-form changes require matching updates.
-The policy page layout/styles/navigation are unchanged by this content update.
+Routine UI/achievement updates and test-to-live changes need no policy rewrite
+if providers, data, purposes and safeguards remain as disclosed. Always check SDK
+and configuration changes for new processing. Additional analytics, payments,
+providers or data uses require a new review and matching disclosure before use.
+The policy layout, styles, navigation, contacts and public URL are preserved.
 
 ## Accessibility and privacy
 

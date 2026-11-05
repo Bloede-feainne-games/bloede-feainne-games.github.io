@@ -1,5 +1,7 @@
 # Privacy evidence — Merge Planets with Google Play Games
 
+> Historical PGS-only audit. For the current rewarded-ad/Yandex integration, use the [5 November 2026 source/APK audit](advertising-privacy-audit-2026-11-05.md) and [current Data Safety guide](google-play-data-safety.md). Older no-ad/offline statements below are historical, not the current SDK inventory.
+
 Audit date: **3 November 2026**. The findings below describe the current working tree and supersede the earlier offline conclusions for the online release. Earlier source-audit notes are preserved below as historical evidence.
 
 ## Current evidence and limits

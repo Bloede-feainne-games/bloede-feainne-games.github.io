@@ -1,0 +1,21 @@
+{
+  "Packages/manifest.json": "6c90dba7db7743923ab4f9548b45a4c16d399ce7b3f2996c8617c506c98d8963",
+  "Assets/_Project/Resources/PlayGamesConfiguration.asset": "db7f4be3b3a1add11741ca92977152735f448f8a79e8e0ebd26c5cad8e97e815",
+  "Assets/_Project/Scripts/Laser/GoogleRewardedAdsProvider.cs": "8bfe9f5af4d82820de87c7ab828ee8bd02907ad7e2c0ba33eec6312b59b94fe5",
+  "Assets/_Project/Scripts/PlayGames/Core/RewardedAds.cs": "5d4c411945a4c5b65d59eb6df3009e3a5fe6069c98a4e6d31f0761edfedf46b4",
+  "Assets/_Project/Scripts/PlayGames/Core/AgeEligibility.cs": "92cff86a84ab5b3455fbc6f69e507cd2324f3c28c0bcb800a5c5edaa08fa49bb",
+  "Assets/_Project/Scripts/PlayGames/Core/ProgressIntegrity.cs": "6502a7cfdf09292b2504236e9b9e646bc37606b6abfac7226d991ef444fd1df6",
+  "Assets/_Project/Scripts/UI/NeutralAgeScreen.cs": "faabb93b59be621d27dcce38423df777938d00950cef1bfc61a7ba1718710b1d",
+  "Assets/_Project/Scripts/Laser/DailyRewardsController.cs": "0444966b08746661933bc6cf72e3e89a35f8decf4df1e9d535bcd49af18c8bd3",
+  "Assets/_Project/Scripts/Laser/CosmicLaserController.cs": "d53a947a0f275818cf913a378f23d6d26f0b465f016fed806227520a92f54ccf",
+  "Assets/_Project/Scripts/UI/PauseMenuController.cs": "58541094578730800dc659758d300a36b6197c3559cac4460443705773d4cdae",
+  "Assets/_Project/Scripts/PlayGames/PlayGamesSceneBridge.cs": "6e574c5e3cfc6d8da0eda55edfd4d0a6d4e1a5814a8bab78b4c6e472d7d8ffb5",
+  "Assets/_Project/Scripts/PlayGames/Core/PlayGamesSyncService.cs": "8795fef430483ffeae42018b375a60753c2f10f42722ee4b602b488cf9303f8f",
+  "Assets/_Project/Scripts/PlayGames/Core/PlayGamesProgress.cs": "0bd9f8ce7c866d5bf5a347c33dc76984df2e36549b2d4e2fb692de488b696ad2",
+  "Assets/_Project/Editor/AdMobBuildConfiguration.cs": "d059c4f8da104bba3bf3c0f8fb2da99acb7e5bf6c7a7c2dbc58c16989eac2ec4",
+  "Assets/_Project/Editor/YandexMediationDependencies.xml": "69ec9ff8a3034ebac98053e76e4a85e0d76ad879368d8b93e6b37220d2b6e886",
+  "Assets/Plugins/Android/AndroidManifest.xml": "b9e8b001973450b588eb6ec78c56e3e4c0ca7f1dca3e52de50e1e0ee2480692d",
+  "ProjectSettings/UnityConnectSettings.asset": "45499af5b2dedc17b464c2e455db05f3e9834f265bb3febe4ef61049e6d67ff5",
+  "Assets/_Project/Scripts/Laser/UnityLaserPurchaseProvider.cs": "f1750244dd84d8b694d5fa6e71a6bb564c8cca12016b617ffb7f9b4ee481c1ab",
+  "Docs/AGE_ADVERTISING_TEST_2026-11-05.txt": "5763b817e930df85e83470f758844730e2cf3e9840a326df9927f9ecb64a8731"
+}

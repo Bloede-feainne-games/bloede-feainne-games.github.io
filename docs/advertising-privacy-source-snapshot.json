@@ -1,0 +1,19 @@
+{
+  "Packages/manifest.json": "6c90dba7db7743923ab4f9548b45a4c16d399ce7b3f2996c8617c506c98d8963",
+  "Assets/_Project/Resources/PlayGamesConfiguration.asset": "325fb2a051b3ebd3a98199921c1f118f4e94fe5793920c91dc9bc230dfaa6070",
+  "Assets/_Project/Scripts/Laser/GoogleRewardedAdsProvider.cs": "b1218e1036b0f357f64c1cb73cead487ee2e31e0270a31a6dae503e7b1ef1f59",
+  "Assets/_Project/Scripts/PlayGames/Core/RewardedAds.cs": "e22b554c38df770fb4d24799e8b79e2fea4ccd61ab3112de3c08d9e35e89c1d1",
+  "Assets/_Project/Scripts/PlayGames/Core/AgeEligibility.cs": "c2e2b071e47bc38e544c6ef9e4364f3159c82c1050c0d8d869080904ee78dfe8",
+  "Assets/_Project/Scripts/PlayGames/Core/ProgressIntegrity.cs": "6502a7cfdf09292b2504236e9b9e646bc37606b6abfac7226d991ef444fd1df6",
+  "Assets/_Project/Scripts/UI/NeutralAgeScreen.cs": "d7a7d3ca3fc28d2829841e369294914d43ac8e5c3418a52b6ef1a24c0cb57cff",
+  "Assets/_Project/Scripts/Laser/DailyRewardsController.cs": "0444966b08746661933bc6cf72e3e89a35f8decf4df1e9d535bcd49af18c8bd3",
+  "Assets/_Project/Scripts/Laser/CosmicLaserController.cs": "d53a947a0f275818cf913a378f23d6d26f0b465f016fed806227520a92f54ccf",
+  "Assets/_Project/Scripts/UI/PauseMenuController.cs": "58541094578730800dc659758d300a36b6197c3559cac4460443705773d4cdae",
+  "Assets/_Project/Scripts/PlayGames/PlayGamesSceneBridge.cs": "6e574c5e3cfc6d8da0eda55edfd4d0a6d4e1a5814a8bab78b4c6e472d7d8ffb5",
+  "Assets/_Project/Scripts/PlayGames/Core/PlayGamesSyncService.cs": "8795fef430483ffeae42018b375a60753c2f10f42722ee4b602b488cf9303f8f",
+  "Assets/_Project/Scripts/PlayGames/Core/PlayGamesProgress.cs": "0bd9f8ce7c866d5bf5a347c33dc76984df2e36549b2d4e2fb692de488b696ad2",
+  "Assets/_Project/Editor/AdMobBuildConfiguration.cs": "34c3084af77ede8bf1bf4e1e7ce661474dfc84c17e70bdefb43b3fe50efa957c",
+  "Assets/_Project/Editor/YandexMediationDependencies.xml": "69ec9ff8a3034ebac98053e76e4a85e0d76ad879368d8b93e6b37220d2b6e886",
+  "Assets/Plugins/Android/AndroidManifest.xml": "b9e8b001973450b588eb6ec78c56e3e4c0ca7f1dca3e52de50e1e0ee2480692d",
+  "ProjectSettings/UnityConnectSettings.asset": "45499af5b2dedc17b464c2e455db05f3e9834f265bb3febe4ef61049e6d67ff5"
+}
